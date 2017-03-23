@@ -1,0 +1,7 @@
+	<script type="text/javascript">
+		function getActivePage() {
+			var pathName = window.location.pathname.substr(1);
+			document.getElementById("nav-" + pathName).className = "active";
+		}
+		
+	</script>

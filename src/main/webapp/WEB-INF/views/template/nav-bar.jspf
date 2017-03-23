@@ -1,0 +1,27 @@
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Hieu's Demo Project</a>
+			</div>
+		    <ul class="nav navbar-nav">
+		    	<li id="nav-home"><a href="${pageContext.request.contextPath}/home">HOME</a></li>
+		    	<li id="nav-products"><a href="${pageContext.request.contextPath}/products">PRODUCTS</a></li>
+		    	<security:authorize access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
+		    		<li id="nav-orders"><a href="${pageContext.request.contextPath}/orders">MY ORDERS</a></li>
+		    	</security:authorize>		    	
+		    	<li id="nav-about"><a href="${pageContext.request.contextPath}/about">ABOUT</a></li>
+		    </ul>
+		    <ul class="nav navbar-nav navbar-right">
+		    	<security:authorize access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
+		    		<li id="nav-your-account"><a href="#"><span class="glyphicon glyphicon-user"></span> Your Account</a></li>
+		    		<li id="nav-shopping-cart"><a href="${pageContext.request.contextPath}/shopping-cart"><span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart</a></li>
+		    	</security:authorize>
+		    	<security:authorize access="!hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
+		    		<li><a href="${pageContext.request.contextPath}/login"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
+		    	</security:authorize>		
+		    	<security:authorize access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
+		    		<li><a href="${pageContext.request.contextPath}/logout"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+		    	</security:authorize>
+		    </ul>
+	  	</div>
+	</nav>
