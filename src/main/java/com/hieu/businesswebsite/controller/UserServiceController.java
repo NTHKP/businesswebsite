@@ -84,4 +84,9 @@ public class UserServiceController {
 		userService.createUser(username, passwordEncoder.encode(password), email, firstName, lastName);
 		return "redirect:login?signUpSuccessful=true";
 	}
+	
+	@RequestMapping(value="/about", method=RequestMethod.GET)
+	public String showAboutPage() {
+		return "about";
+	}
 }

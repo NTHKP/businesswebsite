@@ -1,80 +1,177 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<%@ include file="template/header.jspf" %>
 </head>
-<body>
-<h1>Sign up</h1>
-<p style="color:red;">${usernameExists}</p>
-<p style="color:red;">${emailExists}</p>
-<p id="validationError" style="color:red;"></p>
-<form action="${pageContext.request.contextPath}/signup" method="post">
-	<table>
-		<tr>
-			<td>Username: </td><td><input type="text" name="username" required="required"/></td>
-		</tr>
-		<tr>
-			<td>Password: </td><td><input type="password" name="password" required="required" onchange="passwordValidation()"
-				pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"/></td>
-		</tr>
-		<tr>
-			<td>Confirm Password: </td><td><input type="password" name="confirmPassword" required="required"
-				pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$" onchange="checkConfirmPassword()"/></td>
-		</tr>
-		<tr>
-			<td>First Name: </td><td><input type="text" name="firstName" required="required"/></td>
-		</tr>
-		<tr>
-			<td>Last Name: </td><td><input type="text" name="lastName" required="required"/></td>
-		</tr>
-		<tr>
-			<td>Email: </td><td><input type="text" name="email" required="required" pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}"
-				onchange="emailValidation()"/></td>
-		</tr>
-		<tr>
-			<td colspan="2" align="right"><input id="submitButton" type="submit" disabled="disabled" value="Sign up"/></td>
-		</tr>
-		
-	</table>
-</form>
-
-<script type="text/javascript">
-	function checkConfirmPassword() {
-		var pwd = document.getElementsByName("password")[0].value;
-		var cfmPwd = document.getElementsByName("confirmPassword")[0].value;
-		if(new String(pwd).valueOf() === new String(cfmPwd).valueOf()) {
-			document.getElementById("validationError").innerHTML = null;
-			document.getElementById("submitButton").disabled = false;
-		} else {
-			document.getElementById("validationError").innerHTML = "Password and Confirm Password does not match."
-			document.getElementById("submitButton").disabled = true;
-		}
-	}
+<body onload="getActivePage()">
+	<%@ include file="template/nav-bar.jspf" %>
 	
-	function passwordValidation() {
-		var pwd = document.getElementsByName("password")[0].value;
-		var regex = new RegExp(document.getElementsByName("password")[0].pattern);
-		if(regex.test(pwd)) {
-			document.getElementById("validationError").innerHTML = null;
-		} else {
-			document.getElementById("validationError").innerHTML = "Password must have at least 8 characters and must have at least"
-				+ " 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character.";
+	<div class="container" style="width:40%;">
+		<h2 class="text-center">Sign up</h2>
+		<p class="text-danger">${usernameExists}</p>
+		<p class="text-danger">${emailExists}</p>	
+		
+		<form action="${pageContext.request.contextPath}/signup" method="post">
+			<div class="form-group has-feedback">
+				<label class="control-label" for="username">Username:</label>
+				<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+				  	<input type="text" class="form-control" id="username" name="username" required="required"
+				  			placeholder="Enter your username" onchange="checkNotNull('username'), enableSubmitButton()"/>		
+				</div>
+				<span></span>
+			</div>
+			<div class="form-group has-feedback">
+				<label class="control-label" for="password">Password:</label>
+				<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+				  	<input type="password" class="form-control" id="password" name="password" required="required"
+				  			onchange="passwordValidation(), checkConfirmPassword(), enableSubmitButton()"
+				  			pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+				  			placeholder="Enter your password"/>
+				</div>				
+				<span></span>
+				<div id="pwdNotValid" class="hidden">
+					<p style="margin:0; padding:0;"><small>Password requirements:</small></p>
+					<ul>
+						<li><small>Must have at least 8 characters.</small></li>
+						<li><small>Must have at least 1 upper-case English letter.</small></li>
+						<li><small>Must have at least 1 lower-case English letter.</small></li>
+						<li><small>Must have at least 1 number.</small></li>
+						<li><small>Must have at least 1 special character.</small></li>
+					</ul>
+				</div>
+			</div>
+			<div class="form-group has-feedback">
+				<label class="control-label" for="confirm">Confirm Password:</label>
+			  	<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+				  	<input type="password" class="form-control" id="confirm" name="confirmPassword" required="required"
+				  			pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+				  			onchange="checkConfirmPassword(), enableSubmitButton()"
+				  			placeholder="Confirm your password"/>
+				</div>
+				<span></span>
+				<div id="cfmNotValid" class="hidden">
+					<p><small>Password and Confirm Password does not match.</small></p>
+				</div>
+			</div>
+			<div class="form-group has-feedback">
+				<label class="control-label" for="firstName">First Name:</label>
+				<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+				  	<input type="text" class="form-control" id="firstName" name="firstName" required="required"
+				  			placeholder="Enter your first name" onchange="checkNotNull('firstName'), enableSubmitButton()"/>		
+				</div>		
+				<span></span>
+			</div>
+			<div class="form-group has-feedback">
+				<label class="control-label" for="lastName">Last Name:</label>
+			  	<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+				  	<input type="text" class="form-control" id="lastName" name="lastName" required="required"
+				  			placeholder="Enter your last name" onchange="checkNotNull('lastName'), enableSubmitButton()"/>				
+				</div>
+				<span></span>
+			</div>
+			<div class="form-group has-feedback">
+				<label class="control-label" for="email">Email:</label>
+			  	<div class="input-group">
+	    			<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+				  	<input type="text" class="form-control" id="email" name="email" required="required"
+				  			pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}" onchange="emailValidation(), enableSubmitButton()"
+				  			placeholder="Enter your email"/>				
+				</div>
+				<span></span>
+				<div id="emailNotValid" class="hidden">
+					<p><small>Please enter a valid email.</small></p>
+				</div>
+			</div>
+			<button id="submitButton" type="submit" class="btn btn-block btn-primary" disabled="disabled">Sign up</button>
+		</form>
+	</div>
+	
+	<script type="text/javascript">
+		
+		function enableSubmitButton() {
+			if(document.getElementsByClassName("glyphicon-remove")[0] == null && isAllFilled()) {
+				document.getElementById("submitButton").disabled = false;
+			} else {
+				document.getElementById("submitButton").disabled = true;
+			}
 		}
 		
-	}
-	
-	function emailValidation() {
-		var email = document.getElementsByName("email")[0].value;
-		var regex = new RegExp(document.getElementsByName("email")[0].pattern);
-		if(regex.test(email)) {
-			document.getElementById("validationError").innerHTML = null;
-		} else {
-			document.getElementById("validationError").innerHTML = "Invalid email address.";
+		function isAllFilled() {
+			var username = document.getElementById("username").value;
+			var password = document.getElementById("password").value;
+			var confirm = document.getElementById("confirm").value;
+			var firstName = document.getElementById("firstName").value;
+			var lastName = document.getElementById("lastName").value;
+			var email = document.getElementById("email").value;
+			if(username !== null && username !== ""
+					&& password !== null && password !== ""
+					&& confirm !== null && confirm !== ""
+					&& firstName !== null && firstName !== ""
+					&& lastName !== null && lastName !== ""
+					&& email !== null && email !== "") {
+				return true;
+			} else {
+				return false;
+			}
 		}
-	}
-</script>
+		
+		function checkNotNull(elementId) {
+			var element = document.getElementById(elementId);
+			if(element.value !== null && element.value.trim() !== "") {
+				element.parentElement.parentElement.className = "form-group has-success has-feedback";
+				element.parentElement.nextElementSibling.className = "glyphicon glyphicon-ok form-control-feedback";
+			} else {
+				element.parentElement.parentElement.className = "form-group has-error has-feedback";
+				element.parentElement.nextElementSibling.className = "glyphicon glyphicon-remove form-control-feedback";
+			}
+			
+		}
+	
+		function checkConfirmPassword() {
+			var pwdElement = document.getElementById("password");
+			var cfmPwdElement = document.getElementById("confirm");
+			if(new String(pwdElement.value).valueOf() === new String(cfmPwdElement.value).valueOf()) {
+				document.getElementById("cfmNotValid").className = "hidden";
+				cfmPwdElement.parentElement.parentElement.className = "form-group has-success has-feedback";
+				cfmPwdElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-ok form-control-feedback";
+			} else {
+				document.getElementById("cfmNotValid").className = "show text-danger";
+				cfmPwdElement.parentElement.parentElement.className = "form-group has-error has-feedback";
+				cfmPwdElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-remove form-control-feedback";
+			}
+		}
+		
+		
+		function passwordValidation() {
+			var pwdElement = document.getElementById("password");
+			var regex = new RegExp(document.getElementById("password").pattern);
+			if(regex.test(pwdElement.value)) {
+				document.getElementById("pwdNotValid").className = "hidden";
+				pwdElement.parentElement.parentElement.className = "form-group has-success has-feedback";
+				pwdElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-ok form-control-feedback";
+			} else {
+				document.getElementById("pwdNotValid").className = "show text-danger";
+				pwdElement.parentElement.parentElement.className = "form-group has-error has-feedback";
+				pwdElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-remove form-control-feedback";
+			}
+			
+		}
+		
+		function emailValidation() {
+			var emailElement = document.getElementById("email");
+			var regex = new RegExp(document.getElementById("email").pattern);
+			if(regex.test(emailElement.value)) {
+				document.getElementById("emailNotValid").className = "hidden";
+				emailElement.parentElement.parentElement.className = "form-group has-success has-feedback";
+				emailElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-ok form-control-feedback";
+			} else {
+				document.getElementById("emailNotValid").className = "show text-danger";
+				emailElement.parentElement.parentElement.className = "form-group has-error has-feedback";
+				emailElement.parentElement.nextElementSibling.className = "glyphicon glyphicon-remove form-control-feedback";
+			}
+		}
+	</script>
 </body>
 </html>
