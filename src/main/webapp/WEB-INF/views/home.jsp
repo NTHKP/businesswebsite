@@ -62,5 +62,4 @@
 	</div>
 	
 	<%@ include file="template/common-javascripts.jspf" %>
-</body>
-</html>
+<%@ include file="template/footer.jspf" %>

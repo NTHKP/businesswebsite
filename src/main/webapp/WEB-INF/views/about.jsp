@@ -9,5 +9,4 @@
 		<p>Contact me via email address: <strong class="text-primary">hieunthkp@gmail.com</strong>.</p>
 	</div>
 	<%@ include file="template/common-javascripts.jspf" %>
-</body>
-</html>
+<%@ include file="template/footer.jspf" %>

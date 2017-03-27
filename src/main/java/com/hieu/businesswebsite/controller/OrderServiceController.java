@@ -83,16 +83,33 @@ public class OrderServiceController {
 	}
 	
 	@RequestMapping(value="/edit-product", method=RequestMethod.POST)
-	public String editProduct(@RequestParam String productName, @RequestParam int productPrice,
-			@RequestParam int productQuantityInStock, @RequestParam CommonsMultipartFile productImageFile) {
+	public String editProduct(@RequestParam String name, @RequestParam int price,
+			@RequestParam int quantity, @RequestParam CommonsMultipartFile image) {
 		
-		Product product = new Product(productName, productPrice, productQuantityInStock, productImageFile.getBytes());
+		Product product = new Product(name, price, quantity, image.getBytes());
 		orderService.updateProduct(product);
 		return "redirect:products";
 	}
 	
 	@RequestMapping(value="/shopping-cart", method=RequestMethod.GET)
-	public String showShoppingCart() {
+	public String showShoppingCart(@RequestParam(required=false) String product,
+								@RequestParam(required=false) String quantity,
+								@RequestParam(required=false) String rmvPrd,
+								@RequestParam(required=false) String rmvQty,
+								HttpServletRequest request) {
+		
+		if(product != null && !product.trim().equals("")
+				&& quantity != null && !quantity.trim().equals("")) {
+			request.setAttribute("addedPrd", product);
+			request.setAttribute("addedQty", quantity);
+		}
+		
+		if(rmvPrd != null && !rmvPrd.trim().equals("")
+				&& rmvQty != null && !rmvQty.trim().equals("")) {
+			request.setAttribute("rmvPrd", rmvPrd);
+			request.setAttribute("rmvQty", rmvQty);
+		}
+		
 		return "shopping-cart";
 	}
 	
@@ -115,13 +132,27 @@ public class OrderServiceController {
 			orderedProducts = (List<OrderedProduct>) request.getSession().getAttribute("orderedProducts");
 			totalShoppingCartAmount = (Integer) request.getSession().getAttribute("totalShoppingCartAmount");
 		}
-		orderedProducts.add(orderedProduct);
+		
+		boolean isDuplicateProduct = false;
+		for(OrderedProduct op : orderedProducts) {
+			if(op.getProductName().equals(orderedProduct.getProductName())) {
+				isDuplicateProduct = true;
+				int newQuantity = op.getProductQuantity() + orderedProduct.getProductQuantity();
+				op.setProductQuantity(newQuantity);
+				op.setTotalAmount();
+			}
+		}
+		
+		if(!isDuplicateProduct) {
+			orderedProducts.add(orderedProduct);
+		} 
+		
 		totalShoppingCartAmount += orderedProduct.getTotalAmount();
 		
 		request.getSession().setAttribute("orderedProducts", orderedProducts);
 		request.getSession().setAttribute("totalShoppingCartAmount", totalShoppingCartAmount);
 		
-		return "shopping-cart";
+		return "redirect:shopping-cart?product=" + orderedProduct.getProductName() + "&quantity=" + orderedProduct.getProductQuantity();
 		
 	}
 	
@@ -141,10 +172,33 @@ public class OrderServiceController {
 		orderedProducts.removeAll(removedProducts);
 		request.getSession().setAttribute("orderedProducts", orderedProducts);
 		request.getSession().setAttribute("totalShoppingCartAmount", totalShoppingCartAmount);
+		return "redirect:shopping-cart?rmvPrd=" + removedProducts.get(0).getProductName() + 
+				"&rmvQty=" + removedProducts.get(0).getProductQuantity();
+	}
+	
+	@RequestMapping(value="/update-cart", method=RequestMethod.POST)
+	public String updateCart(@RequestParam String productName, @RequestParam int productQuantity,
+					HttpServletRequest request) {
+		List<OrderedProduct> orderedProducts = (List<OrderedProduct>) request.getSession().getAttribute("orderedProducts");
+		for(OrderedProduct op : orderedProducts) {
+			if(op.getProductName().equals(productName)) {
+				op.setProductQuantity(productQuantity);
+				op.setTotalAmount();
+			}
+		}
+		
+		int totalShoppingCartAmount = 0;
+		for(OrderedProduct op : orderedProducts) {
+			totalShoppingCartAmount += op.getTotalAmount();
+		}
+		
+		request.getSession().setAttribute("orderedProducts", orderedProducts);
+		request.getSession().setAttribute("totalShoppingCartAmount", totalShoppingCartAmount);
+		
 		return "redirect:shopping-cart";
 	}
 	
-	@RequestMapping(value="get-product-image", method=RequestMethod.GET)
+	@RequestMapping(value="/get-product-image", method=RequestMethod.GET)
 	public void getProductImage(@RequestParam String productName, HttpServletResponse response) throws IOException {
 		Product product = orderService.getProductByName(productName);
 		response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
@@ -152,8 +206,13 @@ public class OrderServiceController {
 		response.getOutputStream().close();
 	}
 	
-	@RequestMapping(value="orders", method=RequestMethod.GET)
-	public String showOrdersPage(HttpServletRequest request) {
+	@RequestMapping(value="/orders", method=RequestMethod.GET)
+	public String showOrdersPage(@RequestParam(required=false) String orderRef, HttpServletRequest request) {
+		
+		if(orderRef != null && !orderRef.trim().equals("")) {
+			request.setAttribute("orderRef", "Thank you for placing an order with us. Your order reference is: " + orderRef + ".");
+		}
+		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		UserDetails currentUser = null;
 		if(principal instanceof UserDetails) {
@@ -184,8 +243,12 @@ public class OrderServiceController {
 		return "orders";
 	}
 	
-	@RequestMapping(value="orders", method=RequestMethod.POST)
-	public String addOrder(HttpServletRequest request) {
+	@RequestMapping(value="/orders", method=RequestMethod.POST)
+	public String addOrder(@RequestParam String firstName,
+							@RequestParam String lastName,
+							@RequestParam String email,
+							HttpServletRequest request) {
+		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		UserDetails currentUser = null;
 		if(principal instanceof UserDetails) {
@@ -197,12 +260,42 @@ public class OrderServiceController {
 		order.setTotalAmount((Integer) request.getSession().getAttribute("totalShoppingCartAmount"));
 		order.setOrderDate(new Date());
 		order.setOrderStatus("Processing");
+		order.setCustomerFirstName(firstName);
+		order.setCustomerLastName(lastName);
+		order.setCustomerEmail(email);
 		
 		orderService.createOrder(currentUser.getUsername(), order);
 		
 		request.getSession().setAttribute("orderedProducts", null);
 		request.getSession().setAttribute("totalShoppingCartAmount", null);
 		
-		return "redirect:orders";
+		return "redirect:orders?orderRef=" + order.getOrderId();
+	}
+	
+	@RequestMapping(value="/orders-management", method=RequestMethod.GET)
+	public String showOrdersManagement(@RequestParam(required=false) String id,
+								@RequestParam(required=false) String status,
+								HttpServletRequest request) {
+		
+		if(id != null && !id.trim().equals("")
+				&& status != null && !status.trim().equals("")) {
+			request.setAttribute("id", id);
+			request.setAttribute("status", status);
+		}
+		
+		request.setAttribute("allOrders", orderService.getAllOrders());
+		return "orders-management";
+	}
+	
+	@RequestMapping(value="/orders-management", method=RequestMethod.POST)
+	public String ordersManagement() {
+		return "orders-management";
+	}
+	
+	@RequestMapping(value="/update-order-status", method=RequestMethod.POST)
+	public String updateOrderStatus(@RequestParam int orderId, @RequestParam String orderStatus) {
+		
+		orderService.updateOrder(orderId, orderStatus);
+		return "redirect:orders-management?id=" + orderId + "&status=" + orderStatus;
 	}
 }

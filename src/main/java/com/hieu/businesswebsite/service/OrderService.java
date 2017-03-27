@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,5 +86,21 @@ public class OrderService {
 		return user.getOrders();
 	}
 
+	public List<Order> getAllOrders() {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Order.class);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		return criteria.list();
+	}
 	
+	public Order getOrderByOrderId(int orderId) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Order.class);
+		criteria.add(Restrictions.eq("orderId", orderId));
+		return (Order) criteria.uniqueResult();
+	}
+	
+	public void updateOrder(int orderId, String orderStatus) {
+		Order order = this.getOrderByOrderId(orderId);
+		order.setOrderStatus(orderStatus);
+		sessionFactory.getCurrentSession().update(order);
+	}
 }

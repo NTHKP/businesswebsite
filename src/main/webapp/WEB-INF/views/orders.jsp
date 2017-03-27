@@ -8,6 +8,10 @@
 	<%@ include file="template/nav-bar.jspf" %>
 	<div class="container">
 		<h2>My orders</h2>
+		<p class="text-primary"><em>${orderRef}</em></p>
+		<c:if test="${orderList == null || orderList.isEmpty() == true}">
+			<p class="text-primary"><em>You have not placed any orders with us.</em></p>
+		</c:if>		
 		<div class="row">
 			<c:forEach items="${orderList}" var="order" varStatus="orderDetailsLoop">
 			<div class="col-md-4">
@@ -73,5 +77,4 @@
 		}
 	</script>
 	<%@ include file="template/common-javascripts.jspf" %>
-</body>
-</html>
+<%@ include file="template/footer.jspf" %>

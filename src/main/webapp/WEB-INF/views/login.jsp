@@ -4,9 +4,9 @@
 	<%@ include file="template/nav-bar.jspf" %>
 	<div class="container" style="width:40%;">
 		<h2 class="text-center">Log in</h2>
-		<p class="text-primary">${signUpSuccessful}</p>
-		<p class="text-primary">${logOutSuccessful}</p>
-		<p class="text-danger">${invalidCredentials}</p>
+		<p class="text-primary"><em>${signUpSuccessful}</em></p>
+		<p class="text-primary"><em>${logOutSuccessful}</em></p>
+		<p class="text-danger"><em>${invalidCredentials}</em></p>
 		<form action="${pageContext.request.contextPath}/login" method="post">
 			<div class="form-group has-feedback">
 				<label class="control-label" for="username">Username:</label>
@@ -28,7 +28,7 @@
 			</div>
 			<button id="logInButton" type="submit" class="btn btn-block btn-primary" disabled="disabled">Log in</button>
 			<button id="signUpButton" type="submit" onclick="location.href='${pageContext.request.contextPath}/signup';"
-					class="btn btn-block btn-danger">Sign up an Account</button>
+					class="btn btn-block btn-danger">Sign up a New Account</button>
 		</form>
 	</div>
 	
@@ -67,5 +67,5 @@
 		}
 
 	</script>
-</body>
-</html>
+
+<%@ include file="template/footer.jspf" %>

@@ -28,6 +28,33 @@ public class UserService {
 		return (User) criteria.uniqueResult();
 	}
 	
+	public User updateUser(String username, String firstName, String lastName,
+							String email, String password) {
+		User user = this.getUserByUsername(username);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setEmail(email);
+		user.setPassword(password);
+		sessionFactory.getCurrentSession().update(user);
+		return user;
+	}
+	
+	public User updateUser(String username, String firstName, String lastName,
+							String email) {
+		User user = this.getUserByUsername(username);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setEmail(email);
+		sessionFactory.getCurrentSession().update(user);
+		return user;
+	}
+	
+	/*public List<String> getAllUsernames() {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class);
+		criteria.setProjection(Projections.property("username"));
+		return criteria.list();
+	}*/
+	 
 	/*public boolean checkIfLogInParametersCorrect(String username, String password) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class);
 		criteria.add(Restrictions.eq("username", username));
