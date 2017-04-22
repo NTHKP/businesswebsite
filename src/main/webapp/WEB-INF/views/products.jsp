@@ -27,8 +27,8 @@
 							<p><strong><span id="nameId${loop.index}">${product.productName}</span> <input type="hidden" name="productName" value="${product.productName}"/></strong></p>
 						</div>
 						<div class="panel-body">
-							<img src="${pageContext.request.contextPath}/get-product-image?productName=${product.productName}" alt="${product.productName}"
-											width="100%" height="auto">
+							<img src=<%-- "${pageContext.request.contextPath}/get-product-image?productName=${product.productName}" --%>"data:image/jpeg;base64,${product.productImageBase64}"
+											alt="${product.productName}" width="100%" height="auto">
 						</div>
 						<div class="panel-footer">
 							<ul class="list-unstyled">	

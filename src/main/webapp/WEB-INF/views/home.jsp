@@ -29,6 +29,19 @@
 		</security:authorize>
 	</div>
 	<div class="container">
+		<form class="form-inline" action="${pageContext.request.contextPath}" method="post">
+			<p class="form-control-static">Specify city name to display weather:</p>			
+			<input type="text" class="form-control" name="cityName" />						
+			<button class="btn btn-default" type="submit">Submit</button>					
+		</form>
+		<c:if test="${outCityName != null}">
+			<p>City Name: <span>${outCityName}</span></p>
+			<p>Weather: <span>${outWeather}</span></p>
+			<p>Wind Speed: <span>${outWind}</span></p>
+			<p>Temperature: <span>${outTemp}</span></p>
+		</c:if>
+	</div>
+	<div class="container">
 		<h2>Tutorial</h2>
 		<h3>Guests</h3>
 		<p>Guests may access the most basic features of the website, such as browsing the 

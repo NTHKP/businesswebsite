@@ -1,7 +1,11 @@
 package com.hieu.businesswebsite.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hieu.businesswebsite.entity.User;
 import com.hieu.businesswebsite.service.UserService;
+import com.hieu.businesswebsite.service.WeatherService;
 
 @Controller
 public class UserServiceController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	WeatherService weatherService;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -32,6 +40,27 @@ public class UserServiceController {
 			User user = userService.getUserByUsername(currentUser.getUsername());
 			request.getSession().setAttribute("user", user);
 		}
+		
+		return "home";
+	}
+	
+	@RequestMapping(value={"/", "/home"}, method=RequestMethod.POST)
+	public String showWeather(@RequestParam String cityName, HttpServletRequest request) {
+		JSONObject jsonObject = new JSONObject(weatherService.getJson(cityName));
+		String outCityName = jsonObject.get("name").toString();
+		String outWind = jsonObject.getJSONObject("wind").get("speed").toString();
+		String outTemp = jsonObject.getJSONObject("main").get("temp").toString();
+		
+		String outWeather = null;		
+		JSONArray weatherArray = jsonObject.getJSONArray("weather");
+		for (int i = 0; i < weatherArray.length(); i++) {
+			outWeather = weatherArray.getJSONObject(i).get("main").toString();
+		}
+			
+		request.getSession().setAttribute("outCityName", outCityName);
+		request.getSession().setAttribute("outWeather", outWeather);
+		request.getSession().setAttribute("outWind", outWind);
+		request.getSession().setAttribute("outTemp", outTemp);
 		
 		return "home";
 	}
@@ -136,5 +165,10 @@ public class UserServiceController {
 			request.getSession().setAttribute("user", user);
 		}
 		return "redirect:account?editSuccessful=true";
+	}
+	
+	@RequestMapping(value="/403", method=RequestMethod.GET)
+	public String show403Page() {
+		return "403";
 	}
 }

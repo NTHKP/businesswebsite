@@ -58,7 +58,7 @@ public class OrderService {
 		Product updatingProduct = this.getProductByName(product.getProductName());
 		updatingProduct.setProductPrice(product.getProductPrice());
 		updatingProduct.setProductQuantityInStock(product.getProductQuantityInStock());
-		updatingProduct.setProductImage(product.getProductImage());
+		updatingProduct.setProductImageBase64(product.getProductImageBase64());
 		sessionFactory.getCurrentSession().update(updatingProduct);
 	}
 	

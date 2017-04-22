@@ -1,5 +1,6 @@
 package com.hieu.businesswebsite.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,6 +15,9 @@ public class OrderedProduct {
 	private int productQuantity;
 	private int productPrice;
 	private int totalAmount;
+	@Column(nullable=false, columnDefinition="text")
+	private String productImageBase64;
+	
 	public int getProductId() {
 		return productId;
 	}
@@ -45,6 +49,12 @@ public class OrderedProduct {
 	//Different setter
 	public void setTotalAmount() {
 		this.totalAmount = getProductPrice() * getProductQuantity();
+	}
+	public String getProductImageBase64() {
+		return productImageBase64;
+	}
+	public void setProductImageBase64(String productImageBase64) {
+		this.productImageBase64 = productImageBase64;
 	}
 	
 	

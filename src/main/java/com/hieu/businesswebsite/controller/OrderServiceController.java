@@ -2,6 +2,7 @@ package com.hieu.businesswebsite.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -69,7 +70,8 @@ public class OrderServiceController {
 			return "add-products";
 		}
 		
-		Product product = new Product(productName, productPrice, productQuantityInStock, productImageFile.getBytes());
+		String productImageBase64 = Base64.getEncoder().encodeToString(productImageFile.getBytes());		
+		Product product = new Product(productName, productPrice, productQuantityInStock, productImageBase64);
 		orderService.addProduct(product);
 		request.setAttribute("productAdded", "Product has been added successfully!");
 		return "add-products";
@@ -86,7 +88,9 @@ public class OrderServiceController {
 	public String editProduct(@RequestParam String name, @RequestParam int price,
 			@RequestParam int quantity, @RequestParam CommonsMultipartFile image) {
 		
-		Product product = new Product(name, price, quantity, image.getBytes());
+		String productImageBase64 = Base64.getEncoder().encodeToString(image.getBytes());
+		
+		Product product = new Product(name, price, quantity, productImageBase64);
 		orderService.updateProduct(product);
 		return "redirect:products";
 	}
@@ -123,6 +127,7 @@ public class OrderServiceController {
 		orderedProduct.setProductPrice(product.getProductPrice());
 		orderedProduct.setProductQuantity(productQuantity);
 		orderedProduct.setTotalAmount();
+		orderedProduct.setProductImageBase64(product.getProductImageBase64());
 		
 		int totalShoppingCartAmount = 0;
 		List<OrderedProduct> orderedProducts = null;
@@ -198,13 +203,13 @@ public class OrderServiceController {
 		return "redirect:shopping-cart";
 	}
 	
-	@RequestMapping(value="/get-product-image", method=RequestMethod.GET)
+	/*@RequestMapping(value="/get-product-image", method=RequestMethod.GET)
 	public void getProductImage(@RequestParam String productName, HttpServletResponse response) throws IOException {
 		Product product = orderService.getProductByName(productName);
 		response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-		response.getOutputStream().write(product.getProductImage());
+		response.getOutputStream().write(product.getProductImageBase64());
 		response.getOutputStream().close();
-	}
+	}*/
 	
 	@RequestMapping(value="/orders", method=RequestMethod.GET)
 	public String showOrdersPage(@RequestParam(required=false) String orderRef, HttpServletRequest request) {

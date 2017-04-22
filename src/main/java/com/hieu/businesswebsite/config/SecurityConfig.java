@@ -29,7 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	public void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-				.antMatchers("/orders", "/shopping-cart", "/account").hasAnyRole("ADMIN", "USER")
+				.antMatchers("/add-products", "/edit-product", "/orders-management", "/update-order-status").hasAnyRole("ADMIN")
+				.antMatchers("/orders", "/shopping-cart", "/account", "/remove-from-cart", "/update-cart").hasAnyRole("ADMIN", "USER")
 				.anyRequest().permitAll()
 			.and().formLogin()
 				.loginPage("/login")
@@ -39,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.passwordParameter("password")
 			.and().logout()
 				.logoutSuccessUrl("/login?logout=true")
+			.and().exceptionHandling().accessDeniedPage("/403")
 			.and().csrf().disable();
 	}
 	

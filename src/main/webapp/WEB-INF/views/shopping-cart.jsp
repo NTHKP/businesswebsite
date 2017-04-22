@@ -41,7 +41,7 @@
 			<form action="${pageContext.request.contextPath}/remove-from-cart" method="post">
 				<div class="row">
 					<div class="col-md-2">
-						<img src="${pageContext.request.contextPath}/get-product-image?productName=${orderedProduct.productName}"
+						<img src="data:image/jpeg;base64,${orderedProduct.productImageBase64}"
 								alt="${orderedProduct.productName}" width="100%" height="auto">
 					</div>
 					<div class="col-md-4">

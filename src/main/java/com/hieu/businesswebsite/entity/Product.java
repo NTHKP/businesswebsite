@@ -27,18 +27,17 @@ public class Product {
 	@Column(nullable=false)
 	private int productQuantityInStock;
 	
-	@Lob
-	@Column(nullable=false)
-	private byte[] productImage;
+	@Column(nullable=false, columnDefinition="text")
+	private String productImageBase64;
 
 	public Product() {}
 	
-	public Product(String productName, int productPrice, int productQuantityInStock, byte[] productImage) {
+	public Product(String productName, int productPrice, int productQuantityInStock, String productImageBase64) {
 		super();
 		this.productName = productName;
 		this.productPrice = productPrice;
 		this.productQuantityInStock = productQuantityInStock;
-		this.productImage = productImage;
+		this.productImageBase64 = productImageBase64;
 	}
 
 	public int getProductId() {
@@ -73,12 +72,14 @@ public class Product {
 		this.productQuantityInStock = productQuantityInStock;
 	}
 
-	public byte[] getProductImage() {
-		return productImage;
+	public String getProductImageBase64() {
+		return productImageBase64;
 	}
 
-	public void setProductImage(byte[] productImage) {
-		this.productImage = productImage;
+	public void setProductImageBase64(String productImageBase64) {
+		this.productImageBase64 = productImageBase64;
 	}
+
+
 
 }
